@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
-const calendarUtilities = require('/lib/calendarUtilities');
+const calendarUtils = require('/lib/calendar');
 const reporting = require('/lib/reporting');
 const utils = require('/lib/utils');
 
@@ -28,7 +28,7 @@ exports.transformData = functions.database.ref('/MedidorCorriente/{medidorId}/co
 
         original = snap.val();
 
-        var timeFormatted = calendarUtilities.formatHour(original.Hora);
+        var timeFormatted = calendarUtils.formatHour(original.Hora);
         var idHoraArray = (timeFormatted + '').split(':');
 
         var transformedData = {
@@ -109,32 +109,32 @@ function getBillingCategory(seasonAndWeekDay, idHour) {
 }
 
 function getFirstMondayFebruary() {
-    return calendarUtilities.getMonthDays(2018, calendarUtilities.MONTHS.FEBRUARY).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtilities.DAYS_OF_WEEK.MONDAY
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.FEBRUARY).firstOrNull(function(monthDay) {
+        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
 }
 
 function getFirstMondayMarch() {
-    return calendarUtilities.getMonthDays(2018, calendarUtilities.MONTHS.MARCH).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtilities.DAYS_OF_WEEK.MONDAY
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.MARCH).firstOrNull(function(monthDay) {
+        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
 }
 
 function getFirstMondayNovember() {
-    return calendarUtilities.getMonthDays(2018, calendarUtilities.MONTHS.NOVEMBER).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtilities.DAYS_OF_WEEK.MONDAY
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.NOVEMBER).firstOrNull(function(monthDay) {
+        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
 }
 
 function getFirstSundayApril() {
-    return calendarUtilities.getMonthDays(2018, calendarUtilities.MONTHS.APRIL).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtilities.DAYS_OF_WEEK.SUNDAY
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.APRIL).firstOrNull(function(monthDay) {
+        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
     });
 }
 
 function getLastSundayOctober() {
-    return calendarUtilities.getMonthDays(2018, calendarUtilities.MONTHS.OCTOBER).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtilities.DAYS_OF_WEEK.SUNDAY
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.OCTOBER).firstOrNull(function(monthDay) {
+        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
     });
 }
 
@@ -165,7 +165,7 @@ function getMeasurableWeekDay(day, month, year) {
     var monthIndex = 1;
 
     for (monthIndex = 1; monthIndex <= 12; monthIndex++) {
-        var monthArreglo = calendarUtilities.SPANISH_MONTHS_TEXT[monthIndex - 1];
+        var monthArreglo = calendarUtils.SPANISH_MONTHS_TEXT[monthIndex - 1];
         if (monthArreglo == month) {
             break;
         }
@@ -177,7 +177,7 @@ function getMeasurableWeekDay(day, month, year) {
     var medidorInputDate = new Date(medidorInputDateString);
     var presidentChangeDay = year + "-12-01";
 
-    if (calendarUtilities.isPresidentialYear() && medidorInputDateString == presidentChangeDay) {
+    if (calendarUtils.isPresidentialYear() && medidorInputDateString == presidentChangeDay) {
         return 'D';
     }
 
@@ -189,9 +189,9 @@ function getMeasurableWeekDay(day, month, year) {
 
     var daySemana = medidorInputDate.getDay();
 
-    if (daySemana == calendarUtilities.DAYS_OF_WEEK.SUNDAY) {
+    if (daySemana == calendarUtils.DAYS_OF_WEEK.SUNDAY) {
         return 'D';
     }
 
-    return daySemana == calendarUtilities.DAYS_OF_WEEK.SATURDAY ? 'S' : 'L';
+    return daySemana == calendarUtils.DAYS_OF_WEEK.SATURDAY ? 'S' : 'L';
 }
