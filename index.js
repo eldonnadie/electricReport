@@ -2,10 +2,11 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
-const calendarUtils = require('/lib/calendar');
-const reporting = require('/lib/reporting');
-const utils = require('/lib/utils');
+require('./lib/utils');
+const calendarUtils = require('./lib/calendar');
+const reporting = require('./lib/reporting');
 
+admin.initializeApp(functions.config().firebase);
 var db = admin.database();
 var currentDate = new Date();
 
@@ -18,8 +19,6 @@ var holidays = [
     (getFirstMondayNovember()).toISOString().slice(0, 10),
     currentDate.getYear() + "-12-25",
 ];
-
-admin.initializeApp(functions.config().firebase);
 
 exports.transformData = functions.database.ref('/MedidorCorriente/{medidorId}/corriente').onWrite((event) => {
 
