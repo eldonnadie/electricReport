@@ -2,7 +2,7 @@ const functions = require('firebase-functions');
 
 // The Firebase Admin SDK to access the Firebase Realtime Database.
 const admin = require('firebase-admin');
-require('./lib/utils');
+const utils = require('./lib/utils');
 const calendarUtils = require('./lib/calendar');
 const reporting = require('./lib/reporting');
 
@@ -13,11 +13,11 @@ var currentDate = new Date();
 var holidays = [
     currentDate.getYear() + "-01-01",
     (getFirstMondayFebruary()).toISOString().slice(0, 10),
-    (getFirstMondayFebruary()).toISOString().slice(0, 10),
+    (getFirstMondayMarch()).toISOString().slice(0, 10),
     currentDate.getYear() + "-05-01",
     currentDate.getYear() + "-09-16",
     (getFirstMondayNovember()).toISOString().slice(0, 10),
-    currentDate.getYear() + "-12-25",
+    currentDate.getYear() + "-12-25"
 ];
 
 exports.transformData = functions.database.ref('/MedidorCorriente/{medidorId}/corriente').onWrite((event) => {
@@ -72,8 +72,8 @@ function getTarifa(entradaMedidor, idHour) {
     return getBillingCategory(seasonAndWeekDay, idHour);
 }
 
-function getBillingCategory(seasonAndWeekDay, idHour) {
-    if (seasonAndWeekDay.season == SEASON.SUMMER) {
+function getBillingCategory (seasonAndWeekDay, idHour) {
+    if (seasonAndWeekDay.season == calendarUtils.SEASONS.SUMMER) {
         if (seasonAndWeekDay.weekDay == 'L') {
             if (idHour >= 0 && idHour <= 5) {
                 return "Base";
@@ -107,58 +107,59 @@ function getBillingCategory(seasonAndWeekDay, idHour) {
     }
 }
 
-function getFirstMondayFebruary() {
-    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.FEBRUARY).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
+function getFirstMondayFebruary() {	
+    return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.FEBRUARY).firstOrNull(function(monthDay) {		
+        return monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
 }
 
 function getFirstMondayMarch() {
     return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.MARCH).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
+        return monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
+	
 }
 
 function getFirstMondayNovember() {
     return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.NOVEMBER).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
+        return monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.MONDAY
     });
 }
 
 function getFirstSundayApril() {
     return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.APRIL).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
+        return monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
     });
 }
 
 function getLastSundayOctober() {
     return calendarUtils.getMonthDays(2018, calendarUtils.MONTHS.OCTOBER).firstOrNull(function(monthDay) {
-        monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
+        return monthDay.getDay() == calendarUtils.DAYS_OF_WEEK.SUNDAY
     });
 }
 
 function getSeason(month, day) {
     var firstSundayApril = getFirstSundayApril();
     var lastSundayOct = getLastSundayOctober();
-    var season = "";
+    var season;
 
     if (['Ene', 'Feb', 'Mar', 'Nov', 'Dic'].includes(month)) {
-        season = SEASON.WINTER;
+        season = calendarUtils.SEASONS.WINTER;
     } else if (['May', 'Jun', 'Jul', 'Ago', 'Sep'].includes(month)) {
-        season = SEASON.SUMMER;
+        season = calendarUtils.SEASONS.SUMMER;
     } else if (month == "Abr") {
-        season = day >= firstSundayApril ? SEASON.SUMMER : SEASON.WINTER;
+        season = day >= firstSundayApril ? calendarUtils.SEASONS.SUMMER : calendarUtils.SEASONS.WINTER;
     } else if (month === "Oct") {
-        season = day >= lastSundayOct ? SEASON.SUMMER : SEASON.WINTER;
+        season = day >= lastSundayOct ? calendarUtils.SEASONS.SUMMER : calendarUtils.SEASONS.WINTER;
     } else {
-        season = season.error;
+        season = calendarUtils.SEASONS.ERROR;
     }
 
     return season;
 }
 
 // returns D if it's a holiday or a sunday, returns saturday if it's saturday, otherwise returns L
-function getMeasurableWeekDay(day, month, year) {
+function getMeasurableWeekDay (day, month, year) {
 
     day = ("0" + day).slice(-2);
     var monthIndex = 1;
