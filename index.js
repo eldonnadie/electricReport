@@ -50,9 +50,15 @@ exports.transformData = functions.database.ref('/MedidorCorriente/{medidorId}/co
             }
 
             arrayResponse.push(transformedData);
-            db.ref(finalPath).set(arrayResponse);
 
-            reporting.parseAllDailyReports();
+			console.log('completed proccessing');
+			console.log(arrayResponse.length);
+			console.log(transformedData);
+			console.log('-------------');
+
+            db.ref(finalPath).set(arrayResponse);
+            reporting.dailyReport(original.Anio, original.Mes, original.Dia, transformedData, db);
+            reporting.parseAllDailyReports(db);
         });
     });
 });
@@ -165,8 +171,8 @@ function getMeasurableWeekDay (day, month, year) {
     var monthIndex = 1;
 
     for (monthIndex = 1; monthIndex <= 12; monthIndex++) {
-        var monthArreglo = calendarUtils.SPANISH_MONTHS_TEXT[monthIndex - 1];
-        if (monthArreglo == month) {
+        var monthSpanishDescription = calendarUtils.SPANISH_MONTHS_TEXT[monthIndex - 1];
+        if (monthSpanishDescription == month) {
             break;
         }
     }
@@ -181,17 +187,17 @@ function getMeasurableWeekDay (day, month, year) {
         return 'D';
     }
 
-    for (var holiday in holidays) {
-        if (holidays[holiday] == medidorInputDateString) {
+    for (var holidayIndex in holidays) {
+        if (holidays[holidayIndex] == medidorInputDateString) {
             return 'D';
         }
     }
 
-    var daySemana = medidorInputDate.getDay();
+    var weekDay = medidorInputDate.getDay();
 
-    if (daySemana == calendarUtils.DAYS_OF_WEEK.SUNDAY) {
+    if (weekDay == calendarUtils.DAYS_OF_WEEK.SUNDAY) {
         return 'D';
     }
 
-    return daySemana == calendarUtils.DAYS_OF_WEEK.SATURDAY ? 'S' : 'L';
+    return weekDay == calendarUtils.DAYS_OF_WEEK.SATURDAY ? 'S' : 'L';
 }
